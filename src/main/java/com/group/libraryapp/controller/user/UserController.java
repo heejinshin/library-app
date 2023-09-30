@@ -51,12 +51,24 @@ public class UserController {
 
     @PutMapping("/user")
     public void updateUser(@RequestBody UserUpdateRequest request){
+        String readSql = "SELECT * FROM user WHERE id = ?";  // 조회용 sql ; 존재하는 user인지
+        boolean isUserNotExist = jdbcTemplate.query(readSql, (rs, rowNum) -> 0, request.getId()).isEmpty();  // 비어있다면 UserNotExist가 True인 것으로.
+        if(isUserNotExist) {
+            throw new IllegalArgumentException();
+        }
+
         String sql = "UPDATE user SET name = ? WHERE id = ?";
         jdbcTemplate.update(sql, request.getName(), request.getId());
     }
 
     @DeleteMapping("/user")
     public void deleteUser(@RequestParam String name) {  // 쿼리로 받기때문에 param
+        String readSql = "SELECT * FROM user WHERE name = ?";  // 조회용 sql ; 존재하는 user인지
+        boolean isUserNotExist = jdbcTemplate.query(readSql, (rs, rowNum) -> 0, name).isEmpty();  // 비어있다면 UserNotExist가 True인 것으로.
+        if(isUserNotExist) {
+            throw new IllegalArgumentException();
+        }
+
         String sql = "DELETE FROM user WHERE name = ?";
         jdbcTemplate.update(sql, name);  // sql 업데이트가 아니라 데이터의 변화가 있는걸 업데이트
     }
