@@ -43,11 +43,14 @@ public class UserController {
 //        }
 //        return responses;
         String sql = "Select * FROM user";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> {  // jdbc템플릿의 쿼리가 sql 수행 -> user 정보를 mapRow가 user Response 타입으로 바꿔줌
-            long id = rs.getLong("id");
-            String name = rs.getString("name");
-            int age = rs.getInt("age");
-            return new UserResponse(id, name, age);
+        return jdbcTemplate.query(sql, new RowMapper<UserResponse>() {
+            @Override
+            public UserResponse mapRow(ResultSet rs, int rowNum) throws SQLException {  // jdbc템플릿의 쿼리가 sql 수행 -> user 정보를 mapRow가 user Response 타입으로 바꿔줌
+                long id = rs.getLong("id");
+                String name = rs.getString("name");
+                int age = rs.getInt("age");
+                return new UserResponse(id, name, age);
+            }
         });
     }
 
